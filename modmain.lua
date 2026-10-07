@@ -9,6 +9,8 @@ local ALLOW_MOB_STACK = GetModConfigData("ALLOW_MOB_STACK")
 local STACK_MODE = GetModConfigData("STACK_MODE")
 local EXCLUDE_TRAPS = GetModConfigData("EXCLUDE_TRAPS")
 local PROTECT_RARE = GetModConfigData("PROTECT_RARE")
+local SMOKE_PUFF_ON_STACKING = GetModConfigData("SMOKE_PUFF_ON_STACKING")
+
 local BASIC_RESOURCES = {
     -- 基础资源
     "log",           -- 木头
@@ -150,6 +152,18 @@ end
 
 AddPrefabPostInit("", RecordSpawnTime)
 
+-- 堆叠成功时在物品位置生成烟雾特效
+local function SpawnStackSmoke(inst)
+    if not SMOKE_PUFF_ON_STACKING then return end
+    if not inst or not inst:IsValid() then return end
+    local x, y, z = inst.Transform:GetWorldPosition()
+    local fx = GLOBAL.SpawnPrefab("small_puff")
+    if fx then
+        fx.Transform:SetPosition(x, y, z)
+        fx.Transform:SetScale(0.5, 0.5, 0.5)
+    end
+end
+
 -- 执行堆叠的优化函数
 local function EnhancedStackItems()
     -- 获取世界实例
@@ -285,6 +299,7 @@ local function EnhancedStackItems()
                                             if target.components.stackable and 
                                                not target.components.stackable:IsFull() then
                                                 target.components.stackable:Put(item)
+                                                SpawnStackSmoke(target) 
                                             end
                                         end
                                     end)
@@ -292,6 +307,7 @@ local function EnhancedStackItems()
                                     -- 直接堆叠
                                     if not target.components.stackable:IsFull() then
                                         target.components.stackable:Put(item)
+                                        SpawnStackSmoke(target)
                                     end
                                 end
                             end

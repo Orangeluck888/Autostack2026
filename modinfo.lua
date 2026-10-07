@@ -91,7 +91,13 @@ local config_labels = {
     protect_rare_on = is_chinese and "保护" or "Protect",
     protect_rare_off = is_chinese and "不保护" or "Don't Protect",
     protect_rare_on_hover = is_chinese and "（巨鹿眼球，熊皮，龙蝇皮等）稀有物品不会被堆叠" or "Rare items will not be stacked",
-    protect_rare_off_hover = is_chinese and "（巨鹿眼球，熊皮，龙蝇皮等）稀有物品可以被堆叠" or "Rare items can be stacked"
+    protect_rare_off_hover = is_chinese and "（巨鹿眼球，熊皮，龙蝇皮等）稀有物品可以被堆叠" or "Rare items can be stacked",
+    smoke_puff = is_chinese and "堆叠时冒烟" or "Smoke Puff on Stacking",
+    smoke_puff_hover = is_chinese and "在堆叠发生的位置显示一团烟雾，让自动堆叠看得见。" or "Show a smoke puff at the stacking location so auto-stacking are visible.",
+    smoke_puff_on = is_chinese and "是" or "Yes",
+    smoke_puff_off = is_chinese and "否" or "No",
+    smoke_puff_on_hover = is_chinese and "堆叠时显示烟雾" or "Show smoke when stacking",
+    smoke_puff_off_hover = is_chinese and "堆叠时不显示烟雾" or "No smoke when stacking",
 }
 
 
@@ -212,5 +218,15 @@ configuration_options = {
             {description = config_labels.protect_rare_off, data = false, hover = config_labels.protect_rare_off_hover},
         },
         default = false,
+    },
+    {
+        name = "SMOKE_PUFF_ON_STACKING",
+        label = config_labels.smoke_puff,
+        hover = config_labels.smoke_puff_hover,
+        options = {
+            {description = config_labels.smoke_puff_on, data = true, hover = config_labels.smoke_puff_on_hover},
+            {description = config_labels.smoke_puff_off, data = false, hover = config_labels.smoke_puff_off_hover},
+        },
+        default = true,
     },
 } 
