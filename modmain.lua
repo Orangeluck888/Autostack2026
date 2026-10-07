@@ -175,6 +175,14 @@ local function EnhancedStackItems()
             -- 分组
             local grouped = {}
             for _, item in ipairs(items) do
+                    -- 在陷阱里当诱饵的物品不参与堆叠
+                local is_trap_bait = false
+                if item and item:IsValid() and item.components.bait then
+                  if not item.components.bait:IsFree() then
+                     is_trap_bait = true
+                  end
+                end
+                
                 -- 增加更多安全检查
                 if item and item:IsValid() and item.prefab and 
                    item.components and item.components.stackable and 
@@ -182,7 +190,8 @@ local function EnhancedStackItems()
                    item.components.inventoryitem and 
                    not item.components.inventoryitem:IsHeld() and
                    not item:HasTag("INLIMBO") and
-                   -- 检查是否排除陷阱
+                   not is_trap_bait and
+                   -- 检查是否排除陷阱诱饵
                    (not EXCLUDE_TRAPS or not item:HasTag("trap")) and
                    -- 检查是否保护稀有物品
                    (not PROTECT_RARE or not RARE_ITEMS_LOOKUP[item.prefab]) and

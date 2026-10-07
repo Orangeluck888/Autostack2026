@@ -6,10 +6,10 @@ end
 local is_chinese = GetLanguage():find("zh") ~= nil
 
 
-name = is_chinese and "自动堆叠掉落物2026" or "Auto Stack Items 2026"
+name = is_chinese and "自动堆叠掉落物 2026" or "Auto Stack Items 2026"
 description = is_chinese and "自动将附近的同类掉落物堆叠在一起，极致的简单极致的性能。" or "Automatically stack nearby similar items,The ultimate simplicity and the ultimate performance."
 author = "Salt510"
-version = "2026.0"
+version = "2026.1.2"
 
 
 dst_compatible = true
@@ -115,7 +115,7 @@ configuration_options = {
             {description = config_labels.seconds(60), data = 60},
             {description = config_labels.seconds(120), data = 120}
         },
-        default = 0
+        default = 0.1
     },
     {
         name = "STACK_RADIUS",
@@ -129,9 +129,10 @@ configuration_options = {
             {description = config_labels.tiles(15), data = 15},
             {description = config_labels.tiles(20), data = 20},
             {description = config_labels.tiles(30), data = 30},
+            {description = config_labels.tiles(50), data = 50},
             {description = config_labels.tiles(100), data = 100, hover = config_labels.recommended},
-            {description = config_labels.tiles(30), data = 200},
-            {description = config_labels.tiles(30), data = 500},
+            {description = config_labels.tiles(200), data = 200},
+            {description = config_labels.tiles(500), data = 500},
         },
         default = 100
     },
@@ -179,7 +180,7 @@ configuration_options = {
             {description = config_labels.allow_mob_stack_on, data = true, hover = config_labels.allow_mob_stack_on_hover},
             {description = config_labels.allow_mob_stack_off, data = false, hover = config_labels.allow_mob_stack_off_hover},
         },
-        default = true,
+        default = false,
     },
     {
         name = "STACK_MODE",
