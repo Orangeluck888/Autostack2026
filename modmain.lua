@@ -9,6 +9,7 @@ local ALLOW_MOB_STACK = GetModConfigData("ALLOW_MOB_STACK")
 local STACK_MODE = GetModConfigData("STACK_MODE")
 local EXCLUDE_TRAPS = GetModConfigData("EXCLUDE_TRAPS")
 local PROTECT_RARE = GetModConfigData("PROTECT_RARE")
+local SMOKE_PUFF_ON_STACKING = GetModConfigData("SMOKE_PUFF_ON_STACKING")
 local SMOKE_PUFF_TYPE = GetModConfigData("SMOKE_PUFF_TYPE") or "small_puff"
 
 local BASIC_RESOURCES = {

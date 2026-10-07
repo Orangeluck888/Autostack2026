@@ -173,7 +173,7 @@ configuration_options = {
             {description = config_labels.old_to_new, data = "old_to_new", hover = config_labels.old_to_new_hover},
             {description = config_labels.new_to_old, data = "new_to_old", hover = config_labels.new_to_old_hover}   
         },
-        default = "old_to_new"
+        default = "balanced",
     },
     {
         name = "STACK_DELAY",
