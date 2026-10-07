@@ -9,7 +9,7 @@ local is_chinese = GetLanguage():find("zh") ~= nil
 name = is_chinese and "自动堆叠掉落物 2026" or "Auto Stack Items 2026"
 description = is_chinese and "自动将附近的同类掉落物堆叠在一起，极致的简单极致的性能。" or "Automatically stack nearby similar items,The ultimate simplicity and the ultimate performance."
 author = "Salt510"
-version = "2026.1.2"
+version = "2026.1.4"
 
 
 dst_compatible = true
@@ -98,6 +98,13 @@ local config_labels = {
     smoke_puff_off = is_chinese and "否" or "No",
     smoke_puff_on_hover = is_chinese and "堆叠时显示烟雾" or "Show smoke when stacking",
     smoke_puff_off_hover = is_chinese and "堆叠时不显示烟雾" or "No smoke when stacking",
+    smoke_puff_type = is_chinese and "烟雾样式" or "Smoke Puff Style",
+    smoke_puff_type_hover = is_chinese and "选择堆叠时冒出的烟雾特效样式。" or "Choose the smoke puff effect style when stacking.",
+    smoke_puff_small = is_chinese and "小白烟（默认）" or "Small Puff (Default)",
+    smoke_puff_sand = is_chinese and "沙尘烟" or "Sand Puff",
+    smoke_puff_slide = is_chinese and "滑行烟" or "Slide Puff",
+    smoke_puff_round = is_chinese and "圆烟" or "Round Puff",
+    smoke_puff_puffin = is_chinese and "海雀水花" or "Puffin Water",
 }
 
 
@@ -228,5 +235,18 @@ configuration_options = {
             {description = config_labels.smoke_puff_off, data = false, hover = config_labels.smoke_puff_off_hover},
         },
         default = true,
+    },
+    {
+        name = "SMOKE_PUFF_TYPE",
+        label = config_labels.smoke_puff_type,
+        hover = config_labels.smoke_puff_type_hover,
+        options = {
+            {description = config_labels.smoke_puff_small, data = "small_puff"},
+            {description = config_labels.smoke_puff_sand, data = "sand_puff"},
+            {description = config_labels.smoke_puff_slide, data = "slide_puff"},
+            {description = config_labels.smoke_puff_round, data = "round_puff_fx"},
+            {description = config_labels.smoke_puff_puffin, data = "puffin_water"},
+        },
+        default = "small_puff",
     },
 } 

@@ -9,7 +9,7 @@ local ALLOW_MOB_STACK = GetModConfigData("ALLOW_MOB_STACK")
 local STACK_MODE = GetModConfigData("STACK_MODE")
 local EXCLUDE_TRAPS = GetModConfigData("EXCLUDE_TRAPS")
 local PROTECT_RARE = GetModConfigData("PROTECT_RARE")
-local SMOKE_PUFF_ON_STACKING = GetModConfigData("SMOKE_PUFF_ON_STACKING")
+local SMOKE_PUFF_TYPE = GetModConfigData("SMOKE_PUFF_TYPE") or "small_puff"
 
 local BASIC_RESOURCES = {
     -- 基础资源
@@ -157,10 +157,13 @@ local function SpawnStackSmoke(inst)
     if not SMOKE_PUFF_ON_STACKING then return end
     if not inst or not inst:IsValid() then return end
     local x, y, z = inst.Transform:GetWorldPosition()
-    local fx = GLOBAL.SpawnPrefab("small_puff")
+    local fx = GLOBAL.SpawnPrefab(SMOKE_PUFF_TYPE)
     if fx then
         fx.Transform:SetPosition(x, y, z)
-        fx.Transform:SetScale(0.5, 0.5, 0.5)
+        -- 只有默认小白烟需要缩放，其他特效保持原生大小
+        if SMOKE_PUFF_TYPE == "small_puff" then
+            fx.Transform:SetScale(0.5, 0.5, 0.5)
+        end
     end
 end
 
