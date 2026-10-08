@@ -15,6 +15,9 @@ local FIX_POOP_BUG = GetModConfigData("FIX_POOP_BUG")
 local AUTO_CLEAN = GetModConfigData("AUTO_CLEAN")
 local CLEAN_INTERVAL = GetModConfigData("CLEAN_INTERVAL") or 10
 local CLEAN_TYPE = GetModConfigData("CLEAN_TYPE") or "all"
+local CLEAN_NOTICE = GetModConfigData("CLEAN_NOTICE")
+local CLEAN_NOTICE_ADVANCE = GetModConfigData("CLEAN_NOTICE_ADVANCE") or 120
+local CLEAN_NOTICE_STYLE = GetModConfigData("CLEAN_NOTICE_STYLE") or "formal"
 
 local BASIC_RESOURCES = {
     -- 基础资源
@@ -241,6 +244,45 @@ local CLEAN_EVENT_LIST = {
     pumpkincarver1 = true, pumpkincarver2 = true, pumpkincarver3 = true,
 }
 
+-- 清理通知文本
+local CLEAN_NOTICE_TEXTS = {
+    formal = {
+        "系统将在 %d 秒后清理地面垃圾，请及时收起您的物品。",
+    },
+    humor = {
+        "喂！地上的破烂要没啦！%d 秒后大扫除，快点捡！",
+        "扫地机器人已启动，%d 秒后吞掉地上的所有东西！",
+        "%d 秒后地板要干净了，你的宝贝还在外面的快点捡回来！",
+        "叮咚！垃圾回收车 %d 秒后到达，请把有用的东西抱紧。",
+    },
+}
+
+-- 清理完成公告文本
+local CLEAN_DONE_TEXTS = {
+    formal = {
+        "地面垃圾清理完成。",
+    },
+    humor = {
+        "大扫除完毕，地板干净得能照镜子了！",
+        "扫地机器人收工，地上的宝贝都进异次元了。",
+        "垃圾回收车已离场，地上啥也没剩。",
+        "地面清理完毕，下次记得把东西收好哦。",
+    },
+}
+
+local function GetCleanDoneText()
+    local style = CLEAN_NOTICE_STYLE == "humor" and "humor" or "formal"
+    local pool = CLEAN_DONE_TEXTS[style]
+    return pool[math.random(1, #pool)]
+end
+
+local function GetCleanNoticeText()
+    local style = CLEAN_NOTICE_STYLE == "humor" and "humor" or "formal"
+    local pool = CLEAN_NOTICE_TEXTS[style]
+    local text = pool[math.random(1, #pool)]
+    return string.format(text, CLEAN_NOTICE_ADVANCE)
+end
+
 
 local function AutoCleanGarbage() --自动清理垃圾
     if not AUTO_CLEAN then return end
@@ -269,11 +311,18 @@ local function AutoCleanGarbage() --自动清理垃圾
                     end
                 end
             end
+            
         end
     end
+
+    if CLEAN_NOTICE then
+       GLOBAL.TheNet:Announce(GetCleanDoneText())
+    end
+
 end
 
 -- 修复：自动堆叠便便导致牛无限拉屎
+--FixBeefaloPoop 里 ps.spawntestfn 覆盖后，没有保存原 spawntestfn 的返回值语义。现在这样其实也没问题，只是提醒一下别的地方别再去改 spawntestfn。
 local function FixBeefaloPoop(inst)
     if not inst.components.periodicspawner then return end
 
@@ -497,6 +546,17 @@ AddSimPostInit(function()
         end
             -- 定期清理
         if AUTO_CLEAN then
+            local interval = CLEAN_INTERVAL * 60
+            -- 清理前的通知（提前 N 秒公告）
+            if CLEAN_NOTICE and CLEAN_NOTICE_ADVANCE > 0 
+               and CLEAN_NOTICE_ADVANCE < interval then
+                GLOBAL.TheWorld:DoPeriodicTask(interval,
+                    function()
+                        GLOBAL.TheNet:Announce(GetCleanNoticeText())
+                    end,
+                    interval - CLEAN_NOTICE_ADVANCE)
+            end
+            -- 清理本体
             GLOBAL.TheWorld:DoPeriodicTask(CLEAN_INTERVAL * 60, AutoCleanGarbage)
         end
     end)

@@ -9,7 +9,7 @@ local is_chinese = GetLanguage():find("zh") ~= nil
 name = is_chinese and "自动堆叠掉落物 2026" or "Auto Stack Items 2026"
 description = is_chinese and "自动将附近的同类掉落物堆叠在一起，极致的简单极致的性能。" or "Automatically stack nearby similar items,The ultimate simplicity and the ultimate performance."
 author = "Salt510"
-version = "2026.1.6"
+version = "2026.1.7.0"
 
 
 dst_compatible = true
@@ -123,13 +123,27 @@ local config_labels = {
     clean_type = is_chinese and "清理物品种类" or "Item Types to Clean",
     clean_type_hover = is_chinese and "选择清理哪些类型的物品" or "Choose which item types to clean",
     clean_type_all = is_chinese and "全部清理" or "Clean All",
-    clean_type_all_hover = is_chinese and "清理所有可清理的垃圾物品" or "Clean all cleanable garbage items",
+    clean_type_all_hover = is_chinese and "慎重考虑，此选项将清理所有掉在地上的物品！" or "After careful consideration, this option will clean up all the items that have fallen to the ground!",
     clean_type_basic = is_chinese and "仅基础资源" or "Basic Resources Only",
     clean_type_basic_hover = is_chinese and "只清理木头、石头、草、树枝等基础资源" or "Only clean logs, rocks, grass, twigs, etc.",
     clean_type_food = is_chinese and "仅种子/花瓣/腐烂物" or "Seeds/Petals/Rot Only",
     clean_type_food_hover = is_chinese and "只清理种子、花瓣、腐烂食物等" or "Only clean seeds, petals, rotten food, etc.",
     clean_type_event = is_chinese and "仅节日活动物品" or "Event Items Only",
     clean_type_event_hover = is_chinese and "只清理糖果零食、冬季盛宴装饰、万圣夜装饰和万圣夜小玩具" or "Only clean candy snacks, winter feast ornaments, halloween ornaments, and halloween toys",
+    clean_notice = is_chinese and "清理通知" or "Clean Notice",
+    clean_notice_hover = is_chinese and "清理前和清理后是否提前公告通知玩家" or "Did we give advance notice to the players before and after the cleanup?",
+    clean_notice_on = is_chinese and "开启" or "Enable",
+    clean_notice_off = is_chinese and "关闭" or "Disable",
+    clean_notice_on_hover = is_chinese and "清理前后会公告通知" or "Notifications will be issued before and after the cleaning process.",
+    clean_notice_off_hover = is_chinese and "清理前后不会公告" or "No announcements will be made before and after the cleaning.",
+    clean_notice_advance = is_chinese and "提前通知时间" or "Notice Advance Time",
+    clean_notice_advance_hover = is_chinese and "清理前多少秒开始公告通知" or "How many seconds before cleanup to announce",
+    clean_notice_style = is_chinese and "通知风格" or "Notice Style",
+    clean_notice_style_hover = is_chinese and "清理公告的文字风格" or "Text style of the cleanup announcement",
+    clean_notice_style_formal = is_chinese and "正式" or "Formal",
+    clean_notice_style_formal_hover = is_chinese and "正式的公告文字" or "Formal announcement text",
+    clean_notice_style_humor = is_chinese and "幽默" or "Humorous",
+    clean_notice_style_humor_hover = is_chinese and "幽默搞笑的公告文字" or "Humorous announcement text",
 }
 
 
@@ -318,5 +332,38 @@ configuration_options = {
             {description = config_labels.clean_type_event, data = "event", hover = config_labels.clean_type_event_hover},
         },
         default = "all",
+    },
+    {
+        name = "CLEAN_NOTICE",
+        label = config_labels.clean_notice,
+        hover = config_labels.clean_notice_hover,
+        options = {
+            {description = config_labels.clean_notice_on, data = true, hover = config_labels.clean_notice_on_hover},
+            {description = config_labels.clean_notice_off, data = false, hover = config_labels.clean_notice_off_hover},
+        },
+        default = true,
+    },
+    {
+        name = "CLEAN_NOTICE_ADVANCE",
+        label = config_labels.clean_notice_advance,
+        hover = config_labels.clean_notice_advance_hover,
+        options = {
+            {description = config_labels.seconds(30), data = 30},
+            {description = config_labels.seconds(60), data = 60},
+            {description = config_labels.seconds(120), data = 120},
+            {description = config_labels.seconds(180), data = 180},
+            {description = config_labels.seconds(300), data = 300},
+        },
+        default = 120,
+    },
+    {
+        name = "CLEAN_NOTICE_STYLE",
+        label = config_labels.clean_notice_style,
+        hover = config_labels.clean_notice_style_hover,
+        options = {
+            {description = config_labels.clean_notice_style_formal, data = "formal", hover = config_labels.clean_notice_style_formal_hover},
+            {description = config_labels.clean_notice_style_humor, data = "humor", hover = config_labels.clean_notice_style_humor_hover},
+        },
+        default = "formal",
     },
 } 
