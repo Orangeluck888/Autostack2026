@@ -313,6 +313,8 @@ configuration_options = {
         label = config_labels.clean_interval,
         hover = config_labels.clean_interval_hover,
         options = {
+            {description = config_labels.minutes(1), data = 1},
+            {description = config_labels.minutes(2), data = 2},
             {description = config_labels.minutes(5), data = 5},
             {description = config_labels.minutes(10), data = 10},
             {description = config_labels.minutes(15), data = 15},
