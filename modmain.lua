@@ -12,6 +12,9 @@ local PROTECT_RARE = GetModConfigData("PROTECT_RARE")
 local SMOKE_PUFF_ON_STACKING = GetModConfigData("SMOKE_PUFF_ON_STACKING")
 local SMOKE_PUFF_TYPE = GetModConfigData("SMOKE_PUFF_TYPE") or "small_puff"
 local FIX_POOP_BUG = GetModConfigData("FIX_POOP_BUG")
+local AUTO_CLEAN = GetModConfigData("AUTO_CLEAN")
+local CLEAN_INTERVAL = GetModConfigData("CLEAN_INTERVAL") or 10
+local CLEAN_TYPE = GetModConfigData("CLEAN_TYPE") or "all"
 
 local BASIC_RESOURCES = {
     -- 基础资源
@@ -153,6 +156,122 @@ local function RecordSpawnTime(inst)
 end
 
 AddPrefabPostInit("", RecordSpawnTime)
+-- ========== 定期清理垃圾 ==========
+local CLEAN_BASIC_LIST = {
+    log = true, rocks = true, cutgrass = true, twigs = true, flint = true,
+}
+
+local CLEAN_ROT_FOOD_LIST = {
+    seeds = true, petals = true, petals_evil = true,
+    spoiled_food = true, spoiled_fish = true,spoiled_fish_small = true,
+}
+
+local CLEAN_EVENT_LIST = {
+    -- 糖果零食
+    winter_food1 = true, winter_food2 = true, winter_food3 = true,
+    winter_food4 = true, winter_food5 = true, winter_food6 = true,
+    winter_food7 = true, winter_food8 = true, winter_food9 = true,
+    halloweencandy_1 = true, halloweencandy_2 = true, halloweencandy_3 = true,
+    halloweencandy_4 = true, halloweencandy_5 = true, halloweencandy_6 = true,
+    halloweencandy_7 = true, halloweencandy_8 = true, halloweencandy_9 = true,
+    halloweencandy_10 = true, halloweencandy_11 = true, halloweencandy_12 = true,
+    halloweencandy_13 = true, halloweencandy_14 = true,
+    crumbs = true,
+
+    -- 冬季盛宴装饰
+    winter_ornament_plain1 = true, winter_ornament_plain2 = true,
+    winter_ornament_plain3 = true, winter_ornament_plain4 = true,
+    winter_ornament_plain5 = true, winter_ornament_plain6 = true,
+    winter_ornament_plain7 = true, winter_ornament_plain8 = true,
+    winter_ornament_plain9 = true, winter_ornament_plain10 = true,
+    winter_ornament_plain11 = true, winter_ornament_plain12 = true,
+    winter_ornament_fancy1 = true, winter_ornament_fancy2 = true,
+    winter_ornament_fancy3 = true, winter_ornament_fancy4 = true,
+    winter_ornament_fancy5 = true, winter_ornament_fancy6 = true,
+    winter_ornament_fancy7 = true, winter_ornament_fancy8 = true,
+    winter_ornament_boss_antlion = true,
+    winter_ornament_boss_bearger = true,
+    winter_ornament_boss_beequeen = true,
+    winter_ornament_boss_deerclops = true,
+    winter_ornament_boss_dragonfly = true,
+    winter_ornament_boss_fuelweaver = true,
+    winter_ornament_boss_klaus = true,
+    winter_ornament_boss_krampus = true,
+    winter_ornament_boss_moose = true,
+    winter_ornament_boss_noeyeblue = true,
+    winter_ornament_boss_noeyered = true,
+    winter_ornament_boss_toadstool = true,
+    winter_ornament_boss_toadstool_misery = true,
+    winter_ornament_boss_minotaur = true,
+    winter_ornament_boss_crabking = true,
+    winter_ornament_boss_crabkingpearl = true,
+    winter_ornament_boss_hermithouse = true,
+    winter_ornament_boss_pearl = true,
+    winter_ornament_boss_celestialchampion1 = true,
+    winter_ornament_boss_celestialchampion2 = true,
+    winter_ornament_boss_celestialchampion3 = true,
+    winter_ornament_boss_celestialchampion4 = true,
+    winter_ornament_boss_eyeofterror1 = true,
+    winter_ornament_boss_eyeofterror2 = true,
+    winter_ornament_boss_wagstaff = true,
+    winter_ornament_boss_malbatross = true,
+    winter_ornament_boss_wormboss = true,
+    winter_ornament_boss_sharkboi = true,
+    winter_ornament_boss_daywalker = true,
+    winter_ornament_boss_daywalker2 = true,
+    winter_ornament_boss_mutateddeerclops = true,
+    winter_ornament_boss_mutatedbearger = true,
+    winter_ornament_boss_mutatedwarg = true,
+    winter_ornament_shadowthralls = true,
+    winter_ornament_festivalevents1 = true, winter_ornament_festivalevents2 = true,
+    winter_ornament_festivalevents3 = true, winter_ornament_festivalevents4 = true,
+    winter_ornament_festivalevents5 = true,
+
+    -- 万圣夜装饰
+    halloween_ornament_1 = true, halloween_ornament_2 = true,
+    halloween_ornament_3 = true, halloween_ornament_4 = true,
+    halloween_ornament_5 = true, halloween_ornament_6 = true,
+
+    -- 万圣夜小玩具
+    trinket_32 = true, trinket_33 = true, trinket_34 = true,
+    trinket_35 = true, trinket_36 = true, trinket_37 = true,
+    trinket_38 = true, trinket_39 = true, trinket_40 = true,
+    trinket_41 = true, trinket_42 = true, trinket_43 = true,
+    trinket_44 = true, trinket_45 = true, trinket_46 = true,
+    pumpkincarver1 = true, pumpkincarver2 = true, pumpkincarver3 = true,
+}
+
+
+local function AutoCleanGarbage() --自动清理垃圾
+    if not AUTO_CLEAN then return end
+
+    for _, ent in pairs(GLOBAL.Ents) do
+        if ent.prefab then
+            local should_clean = false
+            if CLEAN_TYPE == "basic" then
+                should_clean = CLEAN_BASIC_LIST[ent.prefab] == true
+            elseif CLEAN_TYPE == "rotfood" then
+                should_clean = CLEAN_ROT_FOOD_LIST[ent.prefab] == true
+            elseif CLEAN_TYPE == "event" then
+                should_clean = CLEAN_EVENT_LIST[ent.prefab] == true
+            else
+                should_clean = ent.components.inventoryitem ~= nil
+            end
+
+            if should_clean then
+                local inv = ent.components.inventoryitem
+                if inv and not inv:IsHeld() and inv.owner == nil
+                   and not ent:HasTag("INLIMBO") then
+                    if not ((ent.components.hunger and ent.components.hunger.current > 0)
+                            or (ent.components.domesticatable
+                                and ent.components.domesticatable.domestication > 0)) then
+                        ent:Remove()
+                    end
+                end
+            end
+        end
+    end
+end
 
 -- 修复：自动堆叠便便导致牛无限拉屎
 local function FixBeefaloPoop(inst)
@@ -376,5 +495,10 @@ AddSimPostInit(function()
             -- 使用配置的间隔时间
             GLOBAL.TheWorld:DoPeriodicTask(STACK_INTERVAL, EnhancedStackItems)
         end
+            -- 定期清理
+        if AUTO_CLEAN then
+            GLOBAL.TheWorld:DoPeriodicTask(CLEAN_INTERVAL * 60, AutoCleanGarbage)
+        end
     end)
 end) 
+

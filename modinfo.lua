@@ -9,7 +9,7 @@ local is_chinese = GetLanguage():find("zh") ~= nil
 name = is_chinese and "自动堆叠掉落物 2026" or "Auto Stack Items 2026"
 description = is_chinese and "自动将附近的同类掉落物堆叠在一起，极致的简单极致的性能。" or "Automatically stack nearby similar items,The ultimate simplicity and the ultimate performance."
 author = "Salt510"
-version = "2026.1.5"
+version = "2026.1.6"
 
 
 dst_compatible = true
@@ -111,6 +111,25 @@ local config_labels = {
     fix_poop_bug_off = is_chinese and "不修复" or "Don't Fix",
     fix_poop_bug_on_hover = is_chinese and "牛会正确识别堆叠便便的数量，不会无限拉屎" or "Beefalo will correctly count stacked poop and stop pooping infinitely",
     fix_poop_bug_off_hover = is_chinese and "保持原版行为（堆叠便便后牛可能会一直拉屎）" or "Keep vanilla behavior (beefalo may keep pooping after poop is stacked)",
+    auto_clean = is_chinese and "定期清理垃圾" or "Auto Clean Garbage",
+    auto_clean_hover = is_chinese and "定期清理散落在地上的垃圾物品。容器、背包中的物品不会被清理。" or "Periodically clean up garbage items on the ground. Items in containers and backpacks are not cleaned.",
+    auto_clean_on = is_chinese and "开启" or "Enable",
+    auto_clean_off = is_chinese and "关闭" or "Disable",
+    auto_clean_on_hover = is_chinese and "定期清理地上的垃圾" or "Periodically clean garbage on the ground",
+    auto_clean_off_hover = is_chinese and "不自动清理" or "Do not auto clean",
+    clean_interval = is_chinese and "清理周期" or "Cleanup Interval",
+    clean_interval_hover = is_chinese and "多久清理一次垃圾（分钟）" or "How often to clean up garbage (minutes)",
+    minutes = function(n) return is_chinese and n.."分钟" or n.." minutes" end,
+    clean_type = is_chinese and "清理物品种类" or "Item Types to Clean",
+    clean_type_hover = is_chinese and "选择清理哪些类型的物品" or "Choose which item types to clean",
+    clean_type_all = is_chinese and "全部清理" or "Clean All",
+    clean_type_all_hover = is_chinese and "清理所有可清理的垃圾物品" or "Clean all cleanable garbage items",
+    clean_type_basic = is_chinese and "仅基础资源" or "Basic Resources Only",
+    clean_type_basic_hover = is_chinese and "只清理木头、石头、草、树枝等基础资源" or "Only clean logs, rocks, grass, twigs, etc.",
+    clean_type_food = is_chinese and "仅种子/花瓣/腐烂物" or "Seeds/Petals/Rot Only",
+    clean_type_food_hover = is_chinese and "只清理种子、花瓣、腐烂食物等" or "Only clean seeds, petals, rotten food, etc.",
+    clean_type_event = is_chinese and "仅节日活动物品" or "Event Items Only",
+    clean_type_event_hover = is_chinese and "只清理糖果零食、冬季盛宴装饰、万圣夜装饰和万圣夜小玩具" or "Only clean candy snacks, winter feast ornaments, halloween ornaments, and halloween toys",
 }
 
 
@@ -264,5 +283,40 @@ configuration_options = {
             {description = config_labels.fix_poop_bug_off, data = false, hover = config_labels.fix_poop_bug_off_hover},
         },
         default = false,
+    },
+        {
+        name = "AUTO_CLEAN",
+        label = config_labels.auto_clean,
+        hover = config_labels.auto_clean_hover,
+        options = {
+            {description = config_labels.auto_clean_on, data = true, hover = config_labels.auto_clean_on_hover},
+            {description = config_labels.auto_clean_off, data = false, hover = config_labels.auto_clean_off_hover},
+        },
+        default = false,
+    },
+    {
+        name = "CLEAN_INTERVAL",
+        label = config_labels.clean_interval,
+        hover = config_labels.clean_interval_hover,
+        options = {
+            {description = config_labels.minutes(5), data = 5},
+            {description = config_labels.minutes(10), data = 10},
+            {description = config_labels.minutes(15), data = 15},
+            {description = config_labels.minutes(30), data = 30},
+            {description = config_labels.minutes(60), data = 60},
+        },
+        default = 10,
+    },
+    {
+        name = "CLEAN_TYPE",
+        label = config_labels.clean_type,
+        hover = config_labels.clean_type_hover,
+        options = {
+            {description = config_labels.clean_type_all, data = "all", hover = config_labels.clean_type_all_hover},
+            {description = config_labels.clean_type_basic, data = "basic", hover = config_labels.clean_type_basic_hover},
+            {description = config_labels.clean_type_food, data = "rotfood", hover = config_labels.clean_type_food_hover},
+            {description = config_labels.clean_type_event, data = "event", hover = config_labels.clean_type_event_hover},
+        },
+        default = "all",
     },
 } 
