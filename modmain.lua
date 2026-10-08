@@ -11,6 +11,7 @@ local EXCLUDE_TRAPS = GetModConfigData("EXCLUDE_TRAPS")
 local PROTECT_RARE = GetModConfigData("PROTECT_RARE")
 local SMOKE_PUFF_ON_STACKING = GetModConfigData("SMOKE_PUFF_ON_STACKING")
 local SMOKE_PUFF_TYPE = GetModConfigData("SMOKE_PUFF_TYPE") or "small_puff"
+local FIX_POOP_BUG = GetModConfigData("FIX_POOP_BUG")
 
 local BASIC_RESOURCES = {
     -- 基础资源
@@ -152,6 +153,46 @@ local function RecordSpawnTime(inst)
 end
 
 AddPrefabPostInit("", RecordSpawnTime)
+
+-- 修复：自动堆叠便便导致牛无限拉屎
+local function FixBeefaloPoop(inst)
+    if not inst.components.periodicspawner then return end
+
+    local ps = inst.components.periodicspawner
+    local old_test = ps.spawntestfn
+
+    ps.spawntestfn = function(owner)
+        -- 先跑原版 CanSpawnPoop，不通过就直接拒绝
+        if old_test and not old_test(owner) then
+            return false
+        end
+
+        -- 再做一次包含 stacksize 的密度检测
+        local x, y, z = owner.Transform:GetWorldPosition()
+        local range = ps.range or 20
+        local density = ps.density or 2
+        local target = ps.prefab or "poop"
+
+        local total = 0
+        local ents = GLOBAL.TheSim:FindEntities(x, y, z, range)
+        for _, ent in ipairs(ents) do
+            if ent.prefab == target then
+                if ent.components.stackable then
+                    total = total + ent.components.stackable.stacksize
+                else
+                    total = total + 1
+                end
+            end
+        end
+
+        -- 堆叠数量加起来达到上限，就拒绝本次生成
+        return total < density
+    end
+end
+
+if FIX_POOP_BUG then
+    AddPrefabPostInit("beefalo", FixBeefaloPoop)
+end
 
 -- 堆叠成功时在物品位置生成烟雾特效
 local function SpawnStackSmoke(inst)

@@ -9,7 +9,7 @@ local is_chinese = GetLanguage():find("zh") ~= nil
 name = is_chinese and "自动堆叠掉落物 2026" or "Auto Stack Items 2026"
 description = is_chinese and "自动将附近的同类掉落物堆叠在一起，极致的简单极致的性能。" or "Automatically stack nearby similar items,The ultimate simplicity and the ultimate performance."
 author = "Salt510"
-version = "2026.1.4"
+version = "2026.1.5"
 
 
 dst_compatible = true
@@ -105,6 +105,12 @@ local config_labels = {
     smoke_puff_slide = is_chinese and "滑行烟" or "Slide Puff",
     smoke_puff_round = is_chinese and "圆烟" or "Round Puff",
     smoke_puff_puffin = is_chinese and "海雀水花" or "Puffin Water",
+    fix_poop_bug = is_chinese and "修复牛无限拉屎" or "Fix Beefalo Infinite Pooping",
+    fix_poop_bug_hover = is_chinese and "修复自动堆叠便便后，牛误以为周围没有便便而无限拉屎的 bug。开启后会统计堆叠数量。" or "Fix the bug where beefalo keep pooping infinitely because auto-stacking merges poop and makes them think there's not enough. Counts stack size when enabled.",
+    fix_poop_bug_on = is_chinese and "修复" or "Fix",
+    fix_poop_bug_off = is_chinese and "不修复" or "Don't Fix",
+    fix_poop_bug_on_hover = is_chinese and "牛会正确识别堆叠便便的数量，不会无限拉屎" or "Beefalo will correctly count stacked poop and stop pooping infinitely",
+    fix_poop_bug_off_hover = is_chinese and "保持原版行为（堆叠便便后牛可能会一直拉屎）" or "Keep vanilla behavior (beefalo may keep pooping after poop is stacked)",
 }
 
 
@@ -248,5 +254,15 @@ configuration_options = {
             {description = config_labels.smoke_puff_puffin, data = "puffin_water"},
         },
         default = "small_puff",
+    },
+    {
+        name = "FIX_POOP_BUG",
+        label = config_labels.fix_poop_bug,
+        hover = config_labels.fix_poop_bug_hover,
+        options = {
+            {description = config_labels.fix_poop_bug_on, data = true, hover = config_labels.fix_poop_bug_on_hover},
+            {description = config_labels.fix_poop_bug_off, data = false, hover = config_labels.fix_poop_bug_off_hover},
+        },
+        default = false,
     },
 } 
