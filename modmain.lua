@@ -18,6 +18,8 @@ local CLEAN_TYPE = GetModConfigData("CLEAN_TYPE") or "all"
 local CLEAN_NOTICE = GetModConfigData("CLEAN_NOTICE")
 local CLEAN_NOTICE_ADVANCE = GetModConfigData("CLEAN_NOTICE_ADVANCE") or 120
 local CLEAN_NOTICE_STYLE = GetModConfigData("CLEAN_NOTICE_STYLE") or "formal"
+local ENABLE_SOUND = GetModConfigData("ENABLE_SOUND")
+local SOUND_TYPE = GetModConfigData("SOUND_TYPE") or "pop"
 
 local BASIC_RESOURCES = {
     -- 基础资源
@@ -377,6 +379,21 @@ local function SpawnStackSmoke(inst)
     end
 end
 
+-- 堆叠成功时在物品位置播放音效
+local STACK_SOUND_MAP = {
+    pop    = "dontstarve/common/destroy_wood",           -- 啵
+    ding   = "dontstarve/wilson/pickup_reeds",           -- 叮
+    whoosh = "dontstarve/common/teleportworm/swallow",   -- 嗖
+    click  = "dontstarve/common/together/packaged",      -- 咔
+}
+
+local function PlayStackSound(inst)
+    if not ENABLE_SOUND then return end
+    if not inst or not inst:IsValid() then return end
+    local sound = STACK_SOUND_MAP[SOUND_TYPE] or STACK_SOUND_MAP.pop
+    inst.SoundEmitter:PlaySound(sound)
+end
+
 -- 执行堆叠的优化函数
 local function EnhancedStackItems()
     -- 获取世界实例
@@ -492,6 +509,25 @@ local function EnhancedStackItems()
                             end
                             return a_time < b_time
                         end)
+                    elseif SORT_METHOD == "near_to_far" then
+                        -- 近到远排序，优先堆到离玩家最近的物品
+                        table.sort(group, function(a, b)
+                            local ax, _, az = a.Transform:GetWorldPosition()
+                            local bx, _, bz = b.Transform:GetWorldPosition()
+                            local da = (ax - x)^2 + (az - z)^2
+                            local db = (bx - x)^2 + (bz - z)^2
+                            return da < db
+                        end)
+                    elseif SORT_METHOD == "far_to_near" then
+                        -- 远到近排序，优先堆到离玩家最远的物品
+                        table.sort(group, function(a, b)
+                            local ax, _, az = a.Transform:GetWorldPosition()
+                            local bx, _, bz = b.Transform:GetWorldPosition()
+                            local da = (ax - x)^2 + (az - z)^2
+                            local db = (bx - x)^2 + (bz - z)^2
+                            return da > db
+                        end)
+                    end
                     end
                     
                     -- 从第一个物品开始，尝试将其他物品堆叠到它上面
@@ -513,6 +549,7 @@ local function EnhancedStackItems()
                                                not target.components.stackable:IsFull() then
                                                 target.components.stackable:Put(item)
                                                 SpawnStackSmoke(target) 
+                                                PlayStackSound(target)
                                             end
                                         end
                                     end)
@@ -521,6 +558,7 @@ local function EnhancedStackItems()
                                     if not target.components.stackable:IsFull() then
                                         target.components.stackable:Put(item)
                                         SpawnStackSmoke(target)
+                                        PlayStackSound(target)
                                     end
                                 end
                             end
