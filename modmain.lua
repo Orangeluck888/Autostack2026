@@ -379,19 +379,18 @@ local function SpawnStackSmoke(inst)
     end
 end
 
--- 堆叠成功时在物品位置播放音效
-local STACK_SOUND_MAP = {
-    pop    = "dontstarve/common/destroy_wood",           -- 啵
-    ding   = "dontstarve/wilson/pickup_reeds",           -- 叮
-    whoosh = "dontstarve/common/teleportworm/swallow",   -- 嗖
-    click  = "dontstarve/common/together/packaged",      -- 咔
-}
-
-local function PlayStackSound(inst)
-    if not ENABLE_SOUND then return end
-    if not inst or not inst:IsValid() then return end
-    local sound = STACK_SOUND_MAP[SOUND_TYPE] or STACK_SOUND_MAP.pop
-    inst.SoundEmitter:PlaySound(sound)
+local function PlayStackSound(player)
+    if not ENABLE_SOUND or not player or not player:IsValid() then return end
+    
+    local sound_map = {
+        pop = "dontstarve/common/destroy_wood",
+        ding = "dontstarve/wilson/pickup_reeds",
+        whoosh = "dontstarve/common/teleportworm/swallow",
+        click = "dontstarve/common/together/packaged"
+    }
+    
+    local sound = sound_map[SOUND_TYPE] or sound_map.pop
+    player.SoundEmitter:PlaySound(sound)
 end
 
 -- 执行堆叠的优化函数
@@ -544,7 +543,7 @@ local function EnhancedStackItems()
                                                not target.components.stackable:IsFull() then
                                                 target.components.stackable:Put(item)
                                                 SpawnStackSmoke(target)
-                                                PlayStackSound(target)
+                                                PlayStackSound(player)
                                             end
                                         end
                                     end)
@@ -553,7 +552,7 @@ local function EnhancedStackItems()
                                     if not target.components.stackable:IsFull() then
                                         target.components.stackable:Put(item)
                                         SpawnStackSmoke(target)
-                                        PlayStackSound(target)
+                                        PlayStackSound(player)
                                     end
                                 end
                             end
